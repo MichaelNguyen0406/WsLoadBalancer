@@ -1,0 +1,52 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.ws.address=:3000"
+    ports:
+      - "80:80"
+      - "3000:3000"
+      - "8081:8081"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  ws1:
+    build: ./websocket-server
+    environment:
+      - REDIS_URL=redis://redis:6379
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ws.rule=PathPrefix(`/ws`)"
+      - "traefik.http.routers.ws.entrypoints=ws"
+      - "traefik.http.routers.ws.service=websocket-service"
+      - "traefik.http.services.websocket-service.loadbalancer.server.port=8080"
+
+  ws2:
+    build: ./websocket-server
+    environment:
+      - REDIS_URL=redis://redis:6379
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ws.rule=PathPrefix(`/ws`)"
+      - "traefik.http.routers.ws.entrypoints=ws"
+      - "traefik.http.routers.ws.service=websocket-service"
+      - "traefik.http.services.websocket-service.loadbalancer.server.port=8080"
+
+  ws3:
+    build: ./websocket-server
+    environment:
+      - REDIS_URL=redis://redis:6379
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ws.rule=PathPrefix(`/ws`)"
+      - "traefik.http.routers.ws.entrypoints=ws"
+      - "traefik.http.routers.ws.service=websocket-service"
+      - "traefik.http.services.websocket-service.loadbalancer.server.port=8080"
